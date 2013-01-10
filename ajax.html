@@ -1,0 +1,187 @@
+<html>
+<head>
+	<title>AJAX playground</title>
+</head>
+<body>
+
+	<h1>Ajax request/response</h1>
+
+	<table>
+		<tr>
+			<td>
+
+				<h2>Request <small>(from client)</small></h2>
+				<p> URL: <input type="text" id="url" size=100>
+				<br> TYPE: <select id="url_type">
+					<option value="POST">POST</option>
+					<option value="PUT">PUT</option>
+					<option value="GET" selected>GET</option>
+					<option value="DELETE">DELETE</option>
+				</select>
+				<br>DATA:<br>
+				<textarea id="request_text" cols=80 rows=6></textarea>
+				<br><input type="button" value="submit" onclick="ajax_submit();"> click here if you entered settings manually
+
+			</td>
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+			<td style="background:#efefef; padding:10px;">
+
+				<h3>Pre-made Examples</h3>
+				GET
+				<br> <input type="button" value="request 'event/popular'" onclick="get_event_popular();"> List of popular events
+				<br> <input type="button" value="request 'event/newest'" onclick="get_event_newest();"> List of newest events
+				<br> <input type="button" value="request 'event/#'" onclick="get_event_by_id();"><input type="text" value="1" id="event_id" size=3> Request a single event by id
+				<br> <input type="button" value="request 'user/#'" onclick="get_user_by_id();"><input type="text" value="1" id="user_id" size=3> Request a single user by id
+				<p>POST
+				<br> <input type="button" value="request 'ajax/request'" onclick="create_event();"> Create a new event
+				<br> <input type="button" value="request 'ajax/request'" onclick="rate_event();"> Rate an event
+				<br> <input type="button" value="request 'ajax/request'" onclick="comment_event();"> Comment on an event
+
+			</td>
+		</tr>
+	</table>
+
+	<hr>
+	<h2>Response <small>(from server)</small></h2>
+	<textarea id="response_text" cols=80 rows=6></textarea>
+
+
+    <script src="jquery.js"></script>
+
+
+    <script type="text/javascript">
+
+    	// Submit the ajax request and display the response.
+    	function ajax_submit() {
+    		// Set up the variables
+    		var url, url_type, data;
+    		url = $('#url').val();
+    		url_type = $('#url_type').val();
+    		data = $('#request_text').val();
+
+    		// Convert string back to JSON
+    		if (data) data = JSON.parse(data);
+
+    		// Call the server
+    		$.ajax({
+    			url: url
+    		,	type: url_type
+    		,	data: data
+
+    		// Success callback
+    		}).done(function(data) {
+    			console.log("Success data", arguments);
+    			$('#response_text').val(data);
+
+    		// Fail callback
+    		}).fail(function(jqXHR, textStatus, HTTPstatus) {
+    			console.log("Fail data", arguments);
+    			var data = textStatus + "(" + HTTPstatus + ")";
+    			$('#response_text').val(data);
+    		});
+    	}
+
+    	function get_user_by_id() {
+    		// Setup fields
+    		var user_id = $('#user_id').val();
+    		$('#url').val('user/' + user_id);
+    		$('#url_type').val('GET');
+    		$('#request_text').val(''); // clear it out
+    		// Submit
+    		ajax_submit();
+    	}
+
+    	function get_event_popular() {
+    		// Setup fields
+    		$('#url').val('event/popular');
+    		$('#url_type').val('GET');
+    		$('#request_text').val(''); // clear it out
+    		// Submit
+    		ajax_submit();
+    	}
+
+    	function get_event_newest() {
+    		// Setup fields
+    		$('#url').val('event/newest');
+    		$('#url_type').val('GET');
+    		$('#request_text').val(''); // clear it out
+    		// Submit
+    		ajax_submit();
+    	}
+
+    	function get_event_by_id() {
+    		// Setup fields
+    		var event_id = $('#event_id').val();
+    		$('#url').val('event/' + event_id);
+    		$('#url_type').val('GET');
+    		$('#request_text').val(''); // clear it out
+    		// Submit
+    		ajax_submit();
+    	}
+
+
+    	function create_event() {
+    		// Setup fields
+    		var data;
+    		$('#url').val('ajax/request');
+    		$('#url_type').val('POST');
+    		data = {
+    			type: "event"
+            ,   action: "create"
+    		,	data: {
+    				title: "Play Halo 100 and shoot things."
+    			,	msg: "Get your XBox 360 and make it rock!"
+                }
+    		};
+    		data = JSON.stringify(data);
+    		$('#request_text').val(data);
+    		// Submit
+    		ajax_submit();
+    	}
+
+		function rate_event() {
+    		// Setup fields
+    		var data;
+    		$('#url').val('/ajax/request');
+    		$('#url_type').val('POST');
+    		data = {
+    			type: "event_rate"
+            ,   action: "create"
+    		,	data: {
+    				event_id: 1
+    			,	interested: true /* want to do it */
+    			, 	rating: 5 /* have done it */
+    			}
+    		};
+    		data = JSON.stringify(data);
+    		$('#request_text').val(data);
+    		// Submit
+    		ajax_submit();
+		}
+
+
+		function comment_event() {
+    		// Setup fields
+    		var data;
+    		$('#url').val('ajax/request');
+    		$('#url_type').val('POST');
+    		data = {
+    			type: "event_rate"
+            ,   action: "create"
+    		,	data: {
+    				event_id: 1
+    			,	msg: "Ask for a free sample."
+    			,	public: true
+    			}
+    		};
+    		data = JSON.stringify(data);
+    		$('#request_text').val(data);
+    		// Submit
+    		ajax_submit();
+		}
+
+
+    </script>
+
+</body>
+</html>
